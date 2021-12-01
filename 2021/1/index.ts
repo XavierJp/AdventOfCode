@@ -1,6 +1,11 @@
-import { extractInput } from "../utils";
+import { extractLines } from "../utils/index.ts";
 
-const determineIncreasedCount = (input) => {
+const dirname = new URL(".", import.meta.url).pathname;
+
+const extractInput = async () => await extractLines(dirname + "input");
+const extractTest = async () => await extractLines(dirname + "test");
+
+const countIncrease = (input: number[]) => {
   let increased = 0;
   input.forEach((record, index) => {
     if (index === 0) {
@@ -13,23 +18,22 @@ const determineIncreasedCount = (input) => {
   return increased;
 };
 
-const firstProblem = () => {
-  const input = extractInput();
-  const increased = determineIncreasedCount(input);
-  console.log(increased);
+const firstProblem = async () => {
+  const input = await extractInput();
+  return countIncrease(input);
 };
 
-const secondProblem = () => {
-  const input = extractInput();
+const secondProblem = async () => {
+  const input = await extractInput();
   const threeMeasurements = [];
   const threeMeasurementCount = input.length - 2;
   for (let i = 0; i < threeMeasurementCount; i++) {
     threeMeasurements[i] = input[i] + input[i + 1] + input[i + 2];
   }
-  const increased = determineIncreasedCount(threeMeasurements);
-  console.log(increased);
+  return countIncrease(threeMeasurements);
 };
 
-firstProblem();
-secondProblem();
+console.log("==== Answers ====");
+console.log(`1: ${await firstProblem()}`);
+console.log(`2: ${await secondProblem()}`);
 export default {};
