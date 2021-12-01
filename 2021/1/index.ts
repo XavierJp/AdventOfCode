@@ -1,9 +1,4 @@
-import { extractLines } from "../utils/index.ts";
-
-const dirname = new URL(".", import.meta.url).pathname;
-
-const extractInput = async () => await extractLines(dirname + "input");
-const extractTest = async () => await extractLines(dirname + "test");
+import ProblemSolver from "../model/index.ts";
 
 const countIncrease = (input: number[]) => {
   let increased = 0;
@@ -18,13 +13,9 @@ const countIncrease = (input: number[]) => {
   return increased;
 };
 
-const firstProblem = async () => {
-  const input = await extractInput();
-  return countIncrease(input);
-};
+const firstProblem = (input: number[]) => countIncrease(input);
 
-const secondProblem = async () => {
-  const input = await extractInput();
+const secondProblem = (input: number[]) => {
   const threeMeasurements = [];
   const threeMeasurementCount = input.length - 2;
   for (let i = 0; i < threeMeasurementCount; i++) {
@@ -33,7 +24,11 @@ const secondProblem = async () => {
   return countIncrease(threeMeasurements);
 };
 
-console.log("==== Answers ====");
-console.log(`1: ${await firstProblem()}`);
-console.log(`2: ${await secondProblem()}`);
+const dirname = new URL(".", import.meta.url).pathname;
+
+const problem1 = new ProblemSolver(dirname, firstProblem, secondProblem);
+
+problem1.test();
+problem1.solve();
+
 export default {};
