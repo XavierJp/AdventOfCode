@@ -14,7 +14,7 @@ class ProblemSolver {
 
   constructor(
     private readonly dirname: string,
-    private parseCallback: (el: string) => any[],
+    private parseCallback: (el: string) => any,
     private solveFirstProblem: (input: any[]) => number,
     private solveSecondProblem?: (input: any[]) => number,
     private readonly useSameEntries = true

@@ -12,6 +12,7 @@ const countIncrease = (input: number[]) => {
   });
   return increased;
 };
+const dirname = new URL(".", import.meta.url).pathname;
 
 const firstProblem = (input: number[]) => countIncrease(input);
 
@@ -24,12 +25,11 @@ const secondProblem = (input: number[]) => {
   return countIncrease(threeMeasurements);
 };
 
-const dirname = new URL(".", import.meta.url).pathname;
-
 const problem1 = new ProblemSolver(
   dirname,
   (el: string) => parseInt(el, 10),
-  firstProblem
+  firstProblem,
+  secondProblem
 );
 
 problem1.test();

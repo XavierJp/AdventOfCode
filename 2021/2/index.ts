@@ -19,7 +19,7 @@ const depthByHorizontalPosition = (input: string[][]) => {
         position.horizontal += quantity;
         return;
       default:
-        throw new Error("should not happen. Received : " + order);
+        throw new Error("should not happen");
     }
   });
   return position.depth * position.horizontal;
@@ -47,7 +47,7 @@ const depthByHorizontalPositionWithAim = (input: string[][]) => {
         position.depth += position.aim * quantity;
         return;
       default:
-        throw new Error("should not happen. Received : " + order);
+        throw new Error("should not happen");
     }
   });
   return position.depth * position.horizontal;
