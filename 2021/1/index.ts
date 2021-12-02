@@ -26,7 +26,11 @@ const secondProblem = (input: number[]) => {
 
 const dirname = new URL(".", import.meta.url).pathname;
 
-const problem1 = new ProblemSolver(dirname, firstProblem, secondProblem);
+const problem1 = new ProblemSolver(
+  dirname,
+  (el: string) => parseInt(el, 10),
+  firstProblem
+);
 
 problem1.test();
 problem1.solve();

@@ -1,5 +1,3 @@
-import { extractLines } from "./helpers.ts";
-
 interface IPaths {
   input: {
     first: string;
@@ -16,8 +14,9 @@ class ProblemSolver {
 
   constructor(
     private readonly dirname: string,
-    private solveFirstProblem: (input: number[]) => number,
-    private solveSecondProblem: (input: number[]) => number | undefined,
+    private parseCallback: (el: string) => any[],
+    private solveFirstProblem: (input: any[]) => number,
+    private solveSecondProblem?: (input: any[]) => number,
     private readonly useSameEntries = true
   ) {
     this.paths = {
@@ -32,7 +31,13 @@ class ProblemSolver {
     };
   }
 
-  private run = (entry: number[], entry2: number[], title: string) => {
+  private extractLines = async (filePath: string): Promise<any[]> => {
+    const input = await Deno.readTextFile(filePath);
+    const lines = input.toString().split("\n");
+    return lines.filter((line) => line !== "").map(this.parseCallback);
+  };
+
+  private run = (entry: any[], entry2: any[], title: string) => {
     console.log("");
     console.log(`=== Solving : ${title} ===`);
 
@@ -40,22 +45,21 @@ class ProblemSolver {
     console.time(timeLabel);
     console.log(`First : ${this.solveFirstProblem(entry)}`);
 
-    const shouldRunSecondProblem = this.solveSecondProblem !== undefined;
-    if (shouldRunSecondProblem) {
+    if (this.solveSecondProblem !== undefined) {
       console.log(`Second : ${this.solveSecondProblem(entry2)}`);
     }
     console.timeEnd(timeLabel);
   };
 
   test = async () => {
-    const entry = await extractLines(this.paths.test.first);
-    const entry2 = await extractLines(this.paths.test.second);
+    const entry = await this.extractLines(this.paths.test.first);
+    const entry2 = await this.extractLines(this.paths.test.second);
     this.run(entry, entry2, "Test");
   };
 
   solve = async () => {
-    const entry = await extractLines(this.paths.input.first);
-    const entry2 = await extractLines(this.paths.input.second);
+    const entry = await this.extractLines(this.paths.input.first);
+    const entry2 = await this.extractLines(this.paths.input.second);
     this.run(entry, entry2, "Solution");
   };
 }
