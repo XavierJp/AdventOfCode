@@ -1,5 +1,3 @@
-import ProblemSolver from "../model/index.ts";
-
 const depthByHorizontalPosition = (input: string[][]) => {
   const position = {
     depth: 0,
@@ -54,19 +52,10 @@ const depthByHorizontalPositionWithAim = (input: string[][]) => {
 };
 
 const firstProblem = (input: string[][]) => depthByHorizontalPosition(input);
+
 const secondProblem = (input: string[][]) =>
   depthByHorizontalPositionWithAim(input);
 
-const dirname = new URL(".", import.meta.url).pathname;
+const lineParser = (el: string) => el.split(" ");
 
-const problem1 = new ProblemSolver(
-  dirname,
-  (el: string) => el.split(" "),
-  firstProblem,
-  secondProblem
-);
-
-problem1.test();
-problem1.solve();
-
-export default {};
+export { firstProblem, secondProblem, lineParser };

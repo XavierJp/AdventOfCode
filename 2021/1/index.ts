@@ -1,5 +1,3 @@
-import ProblemSolver from "../model/index.ts";
-
 const countIncrease = (input: number[]) => {
   let increased = 0;
   input.forEach((record, index) => {
@@ -12,7 +10,6 @@ const countIncrease = (input: number[]) => {
   });
   return increased;
 };
-const dirname = new URL(".", import.meta.url).pathname;
 
 const firstProblem = (input: number[]) => countIncrease(input);
 
@@ -25,14 +22,6 @@ const secondProblem = (input: number[]) => {
   return countIncrease(threeMeasurements);
 };
 
-const problem1 = new ProblemSolver(
-  dirname,
-  (el: string) => parseInt(el, 10),
-  firstProblem,
-  secondProblem
-);
+const lineParser = (line: string) => parseInt(line, 10);
 
-problem1.test();
-problem1.solve();
-
-export default {};
+export { firstProblem, secondProblem, lineParser };
