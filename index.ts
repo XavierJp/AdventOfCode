@@ -26,7 +26,8 @@ try {
     const dirname = new URL(".", import.meta.url).pathname;
     const folder = `${dirname}${year}/${day}/`;
     const file = `${folder}index.ts`;
-    const { firstProblem, secondProblem, lineParser } = await import(file);
+    const { firstProblem, secondProblem, lineParser, shouldRunProd } =
+      await import(file);
 
     if (!firstProblem) {
       throw new Error(
@@ -50,7 +51,9 @@ try {
     );
 
     solver.test();
-    solver.solve();
+    if (shouldRunProd) {
+      solver.solve();
+    }
   } else {
     throw new Error(ERRORS.NOARGS);
   }
