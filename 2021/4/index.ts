@@ -1,136 +1,100 @@
-interface ICard {
-  values: { [key: string]: number[][] };
+import { sum, range } from "../../helpers/index.ts";
+interface ICard2 {
   lines: number[][];
-  draws: number[][];
+  draws: (number | string)[][];
+  hasWon: boolean;
 }
-const sum = (input: number[]) => input.reduce((sum, elem) => sum + elem, 0);
-
-const verify = (card: ICard) => {
-  const columns = [0, 0, 0, 0, 0];
-  const lines = [0, 0, 0, 0, 0];
-  for (let i = 0; i < card.draws.length; i++) {
-    const lineIdx = card.draws[i][0];
-    lines[lineIdx] += 1;
-    if (lines[lineIdx] === 5) {
-      return true;
-    }
-    const colIdx = card.draws[i][1];
-    columns[colIdx] += 1;
-    if (columns[colIdx] === 5) {
-      return true;
-    }
-  }
-  return false;
-};
-
 const parseCardLine = (line: string): number[] =>
   line
     .split(" ")
     .filter((el) => el !== "")
     .map((el) => parseInt(el, 10));
 
-const playBingo = (input: string[]) => {
-  const draws = input[0].split(",").map((el) => parseInt(el, 10));
+const verifyCard = (card: ICard2) => {
+  for (let i = 0; i < 5; i++) {
+    const lineSuccess = card.draws[i].filter((el) => el === "*").length === 0;
+    const columnSuccess =
+      card.draws.map((el) => el[i]).filter((el) => el === "*").length === 0;
 
-  const bingosCards = input
-    .slice(1)
-    .reduce((cards: ICard[], line: string, index: number) => {
-      const valueList = parseCardLine(line);
-      if (index % 5 === 0) {
-        cards.push({ lines: [], values: {}, draws: [] });
-      }
-      cards[cards.length - 1].lines.push(parseCardLine(line));
+    if (lineSuccess || columnSuccess) {
+      return true;
+    }
+  }
 
-      const linePosition = cards[cards.length - 1].lines.length;
-      valueList.forEach((val, index) => {
-        if (cards[cards.length - 1].values[val]) {
-          cards[cards.length - 1].values[val].push([linePosition, index]);
-        } else {
-          cards[cards.length - 1].values[val] = [[linePosition, index]];
-        }
-      });
-      return cards;
-    }, []);
+  return false;
+};
 
-  for (let i = 0; i < draws.length; i++) {
-    const draw = draws[i];
-    for (let j = 0; j < bingosCards.length; j++) {
-      const card = bingosCards[j];
-      if (card.values[draw]) {
-        bingosCards[j].draws = [...card.draws, ...card.values[draw]];
-      }
-      if (verify(card)) {
-        const allValues = Object.keys(card.values).map((el) =>
-          parseInt(el, 10)
-        );
-        const allDraws = draws.slice(0, i + 1);
-
-        return (
-          sum(allValues.filter((el) => allDraws.indexOf(el) === -1)) * draw
-        );
+const getScore = (card: ICard2, draw: number) => {
+  let score = 0;
+  for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 5; j++) {
+      if (card.draws[i][j] === "*") {
+        score += card.lines[i][j];
       }
     }
   }
+  return score * draw;
 };
 
-const lastBingoWin = (input: string[]) => {
+const playBingo2 = (input: string[], strategyLast = false) => {
   const draws = input[0].split(",").map((el) => parseInt(el, 10));
 
-  const bingosCards = input
-    .slice(1)
-    .reduce((cards: ICard[], line: string, index: number) => {
-      const valueList = parseCardLine(line);
-      if (index % 5 === 0) {
-        cards.push({ lines: [], values: {}, draws: [] });
-      }
-      cards[cards.length - 1].lines.push(parseCardLine(line));
-
-      const linePosition = cards[cards.length - 1].lines.length;
-      valueList.forEach((val, index) => {
-        if (cards[cards.length - 1].values[val]) {
-          cards[cards.length - 1].values[val].push([linePosition, index]);
-        } else {
-          cards[cards.length - 1].values[val] = [[linePosition, index]];
-        }
+  const bingoCards = range(0, Math.floor((input.length - 1) / 5) - 1).reduce(
+    (bingoCards: ICard2[], cardIdx: number) => {
+      bingoCards.push({
+        lines: input
+          .slice(cardIdx * 5 + 1, (cardIdx + 1) * 5 + 1)
+          .map(parseCardLine),
+        draws: [
+          ["*", "*", "*", "*", "*"],
+          ["*", "*", "*", "*", "*"],
+          ["*", "*", "*", "*", "*"],
+          ["*", "*", "*", "*", "*"],
+          ["*", "*", "*", "*", "*"],
+        ],
+        hasWon: false,
       });
-      return cards;
-    }, []);
+      return bingoCards;
+    },
+    []
+  );
 
-  const cardWinner = {} as any;
-  let lastWinner = null;
-
-  for (let i = 0; i < draws.length; i++) {
-    const draw = draws[i];
-    for (let j = 0; j < bingosCards.length; j++) {
-      const card = bingosCards[j];
-      if (card.values[draw]) {
-        bingosCards[j].draws = [...card.draws, ...card.values[draw]];
+  let score = 0;
+  draws.forEach((draw) => {
+    bingoCards.forEach((card) => {
+      for (let i = 0; i < 5; i++) {
+        for (let j = 0; j < 5; j++) {
+          if (card.lines[i][j] === draw) {
+            card.draws[i][j] = 1;
+          }
+        }
       }
-      if (verify(card)) {
-        cardWinner[j] = true;
-        lastWinner = card;
-      }
-    }
-    if (Object.keys(cardWinner).length === bingosCards.length && lastWinner) {
-      const allValues = Object.keys(lastWinner.values).map((el) =>
-        parseInt(el, 10)
-      );
-      const allDraws = draws.slice(0, i + 1);
+      const hasWon = verifyCard(card);
 
-      console.log(draw, lastWinner);
-      console.log(allValues.filter((el) => allDraws.indexOf(el) === -1));
-      console.log(allDraws);
-      return sum(allValues.filter((el) => allDraws.indexOf(el) === -1)) * draw;
-    }
-  }
+      if (score === 0 && hasWon) {
+        if (strategyLast) {
+          card.hasWon = true;
+          if (bingoCards.every((c) => c.hasWon)) {
+            score = getScore(card, draw);
+          }
+        } else {
+          if (!card.hasWon) {
+            score = getScore(card, draw);
+            card.hasWon = true;
+          }
+        }
+      }
+    });
+  });
+  return score;
 };
 
-const firstProblem = (input: string[]) => playBingo(input);
+const firstProblem = (input: string[]) => playBingo2(input);
 
-const secondProblem = (input: string[]) => lastBingoWin(input);
+const secondProblem = (input: string[]) => playBingo2(input, true);
 
 const lineParser = (el: string) => el;
 
-const shouldRunProd = false;
+const shouldRunProd = true;
 
 export { firstProblem, secondProblem, lineParser, shouldRunProd };
